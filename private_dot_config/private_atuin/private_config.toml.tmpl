@@ -1,0 +1,86 @@
+# Managed by chezmoi
+{{- $termux := eq .environment "termux" }}
+
+# --- Behavior ---
+enter_accept = true
+search_mode = "fuzzy"
+filter_mode = "global"
+# Up-arrow shows only the current session
+filter_mode_shell_up_key_binding = "session"
+workspaces = true
+
+# --- Sync ---
+auto_sync = true
+sync_frequency = "5m"
+update_check = false
+
+# --- UI ---
+style = "compact"
+invert = true
+show_help = false
+show_tabs = false
+inline_height = {{ if $termux }}8{{ else }}12{{ end }}
+inline_height_shell_up_key_binding = {{ if $termux }}8{{ else }}12{{ end }}
+
+# --- Privacy ---
+secrets_filter = true
+history_filter = [
+  # Secrets
+  "^export BW_SESSION",
+  "^export .*(KEY|TOKEN|SECRET|PASSWORD)",
+  "(TOKEN|SECRET|PASSWORD|API_KEY)=",
+  "--password",
+  'add-authtoken',
+
+  # Noise
+  "^.{1,2}$",
+  "^(clear|pwd|exit|history)$",
+  '^\s*$',
+  '^[0-9]+;[0-9;]*[cM]',
+  'org\.freedesktop\.Platform',
+  'org\.gnome\.Platform',
+  '^- ',
+  '^atuin status$',
+  '^zsh$',
+  '^bash$',
+  '^fish$',
+  '^atuin logout$',
+  '^sudo adduser ben$',
+  '^su ben$',
+  '^sudo adduser orion$',
+  '^git pull origin main$',
+  '^rm -rf ~/\.histdb/$',
+  '^ls ~/\.histdb/$',
+  '^z chezmoi$',
+  '^chezmoi init$',
+  '^chezmoi apply$',
+  '^chmod u\+x exe\.sh$',
+  '^ll exe\.sh$',
+  '^cat exe\.sh$',
+  '^\./exe\.sh$',
+  '^chezmoi execute-template run_once_unix_01_install\.sh\.tmpl > exe\.sh$',
+  '^chezmoi execute-template > run_once_unix_01_install\.sh\.tmpl > exe\.sh$',
+  '^chezmoi execute-template < run_once_unix_01_install\.sh\.tmpl < exe\.sh$',
+  '^chezmoi execute-template > run_once_unix_01_install\.sh\.tmpl$',
+  '^chezmoi execute-template < run_once_unix_01_install\.sh\.tmpl$',
+  '^chezmoi execute-template < run_once_unix_01_install\.sh\.tmpl > exe\.sh$',
+  '^vi run_once_unix_01_install\.sh\.tmpl$',
+  '^cat run_once_unix_01_install\.sh\.tmpl$',
+  '^git restore run_once_unix_01_install\.sh\.tmpl$',
+]
+
+[sync]
+records = true
+
+[tmux]
+# Requires tmux >= 3.2
+enabled = true
+width = "80%"
+height = "60%"
+
+[ui]
+columns = ["duration", "time", { type = "directory", width = 25 }, "command"]
+
+[stats]
+ignored_commands = ["cd", "ls", "clear"]
+common_prefix = ["sudo"]

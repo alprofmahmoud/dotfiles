@@ -1,0 +1,156 @@
+" ============================
+" Neovim Main Configuration
+" ============================
+" ============================
+" Leader Key
+" ============================
+let mapleader = ','
+
+" ============================
+" Load Plugins
+" ============================
+" Vim-Plug
+if filereadable(expand('{{ .nvimdir }}/plugins.vim'))
+    source {{ .nvimdir }}/plugins.vim
+endif
+
+" ============================
+" Load Basic Settings
+" ============================
+" Global Settings
+if filereadable(expand('{{ .nvimdir }}/settings.vim'))
+    source {{ .nvimdir }}/settings.vim
+endif
+
+" Lualine - load lua config
+if filereadable(expand('{{ .pluginsdir }}/lualine.lua'))
+    luafile {{ .pluginsdir }}/lualine.lua
+endif
+
+" Gitsigns - load lua config
+if filereadable(expand('{{ .pluginsdir }}/gitsigns.lua'))
+    luafile {{ .pluginsdir }}/gitsigns.lua
+endif
+
+" Ale config
+if filereadable(expand('{{ .pluginsdir }}/ale.vim'))
+    source {{ .pluginsdir }}/ale.vim
+endif
+
+" Fzf finder config
+if filereadable(expand('{{ .pluginsdir }}/fzf.vim'))
+    source {{ .pluginsdir }}/fzf.vim
+endif
+
+" Neogit - load lua config
+if filereadable(expand('{{ .pluginsdir }}/neogit.lua'))
+    luafile {{ .pluginsdir }}/neogit.lua
+endif
+
+" Instant Markdown Preview config
+if filereadable(expand('{{ .pluginsdir }}/instant-markdown-preview.vim'))
+    source {{ .pluginsdir }}/instant-markdown-preview.vim
+endif
+
+" Markdown Preview config
+if filereadable(expand('{{ .pluginsdir }}/markdown-preview.vim'))
+    source {{ .pluginsdir }}/markdown-preview.vim
+endif
+
+" LSP Server - load lua config
+if filereadable(expand('{{ .pluginsdir }}/lsp.lua'))
+    luafile {{ .pluginsdir }}/lsp.lua
+endif
+
+" CMP - load lua config
+if filereadable(expand('{{ .pluginsdir }}/cmp.lua'))
+    luafile {{ .pluginsdir }}/cmp.lua
+endif
+
+" Indent-blankline - load lua config
+if filereadable(expand('{{ .pluginsdir }}/indent-blankline.lua'))
+    luafile {{ .pluginsdir }}/indent-blankline.lua
+endif
+
+" Bufferline config
+if filereadable(expand('{{ .pluginsdir }}/bufferline.lua'))
+    luafile {{ .pluginsdir }}/bufferline.lua
+endif
+
+" Clipboard config
+if filereadable(expand('{{ .pluginsdir }}/clipboard.lua'))
+    luafile {{ .pluginsdir }}/clipboard.lua
+endif
+
+" ============================
+" Not Equal Android
+" ============================
+{{ if ne .chezmoi.os "android"  }}
+" Copilot config
+if filereadable(expand('{{ .pluginsdir }}/copilot.vim'))
+    source {{ .pluginsdir }}/copilot.vim
+endif
+
+" Flutter-tools config
+if filereadable(expand('{{ .pluginsdir }}/flutter-tools.lua'))
+    luafile {{ .pluginsdir }}/flutter-tools.lua
+endif
+
+" Nvim-tree config
+if filereadable(expand('{{ .pluginsdir }}/nvim-tree.lua'))
+    luafile {{ .pluginsdir }}/nvim-tree.lua
+endif
+
+" Auto save config
+if filereadable(expand('{{ .pluginsdir }}/autosave.vim'))
+    source {{ .pluginsdir }}/autosave.vim
+endif
+{{- end }}
+
+" ============================
+" Environment Special
+" ============================
+" Termux
+{{ if eq .chezmoi.os "android"  }}
+" Termux config
+if filereadable(expand('{{ .nvimdir }}/termux.vim'))
+    source {{ .nvimdir }}/termux.vim
+endif
+
+" Nerdtree config
+if filereadable(expand('{{ .pluginsdir }}/nerdtree.vim'))
+    source {{ .pluginsdir }}/nerdtree.vim
+endif
+
+" Debian
+{{- else if eq .environment "debian" }}
+if filereadable(expand('{{ .nvimdir }}/debian.vim'))
+    source {{ .nvimdir }}/debian.vim
+endif
+
+" Voidlinux
+{{- else if eq .environment "void" }}
+if filereadable(expand('{{ .nvimdir }}/voidlinux.vim'))
+    source {{ .nvimdir }}/voidlinux.vim
+endif
+
+" Windows
+{{- else if eq .chezmoi.os "windows" }}
+if filereadable(expand('{{ .nvimdir }}/windows.vim'))
+    source {{ .nvimdir }}/windows.vim
+endif
+
+{{- end }}
+
+" ============================
+" Load Key Mappings
+" ============================
+if filereadable(expand('{{ .nvimdir }}/mappings.vim'))
+    source {{ .nvimdir }}/mappings.vim
+endif
+
+" ============================
+" Security
+" ============================
+set exrc
+set secure

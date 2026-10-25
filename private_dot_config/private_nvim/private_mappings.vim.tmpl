@@ -1,0 +1,116 @@
+" ============================
+" Key Mappings
+" ============================
+" ============================
+" Normal Mode Mappings
+" ============================
+
+" Save file
+nmap <C-s> :w<CR>
+
+" Save files with sudo privileges
+cnoremap w!! w !sudo tee % > /dev/null<CR>:edit!<CR>
+
+" Reload config
+nmap <leader>s :source {{ .nvimdir }}/init.vim<CR>
+
+" Edit config file
+nnoremap <leader>it :edit {{ .nvimdir }}/init.vim<CR>
+
+" ============================
+" Tab Navigation
+" ============================
+nnoremap <C-Left> :tabprevious<CR>
+nnoremap <C-Right> :tabnext<CR>
+" Switch windows
+nnoremap <C-h> <C-w>h
+nnoremap <C-l> <C-w>l
+" New tab
+nnoremap <leader>t :tabnew<CR>:NvimTreeToggle<CR>
+" Close tab
+nnoremap <leader>q :tabclose<CR>
+" Close all windows with Ctrl+q
+nnoremap <C-q> :qa<CR>
+" Force quit all - without saving
+nnoremap <leader>qq :qa!<CR>
+" Save and quit all
+nnoremap <leader>wq :wqa<CR>
+" execute Dart file in Neovim
+nnoremap <F5> :!dart %<CR>
+
+" ============================
+" Folding
+" ============================
+" Create fold from current position to end of block
+nnoremap <leader>zz zf}
+
+" ============================
+" Select All and Copy
+" ============================
+" Select all
+nnoremap <leader>a ggVG
+
+" Copy all to system clipboard
+nnoremap <leader>y gg"*yG``
+
+" Paste from system with Ctrl+V
+nnoremap <leader>v "+p
+
+set listchars=tab:→\ ,space:·,trail:·
+nnoremap <leader>. :set list!<CR>
+
+autocmd VimEnter * lua
+    \ local gs = require('gitsigns')
+    \ vim.keymap.set('n', '<leader>hp', gs.preview_hunk)
+    \ vim.keymap.set('n', '<leader>hs', gs.stage_hunk)
+    \ vim.keymap.set('n', '<leader>hr', gs.reset_hunk)
+    \ vim.keymap.set('n', '<leader>hb', gs.blame_line)
+    \ vim.keymap.set('n', ']h', gs.next_hunk)
+    \ vim.keymap.set('n', '[h', gs.prev_hunk)
+
+
+" Toggle comment on current line (normal) or selected lines (visual)
+nmap <leader>/ gcc
+vmap <leader>/ gc
+
+
+" ============================
+" Search
+" ============================
+" Clear search highlight
+nnoremap <silent> <Space> :nohlsearch<CR>
+
+" ============================
+" Insert Mode Mappings
+" ============================
+
+" Save file from insert mode
+imap <C-s> <ESC>:w<CR>
+
+" Open file explorer from insert mode
+imap <C-o> :e .<CR>
+
+" ============================
+" Visual Mode Mappings
+" ============================
+
+" Indent right and stay in visual mode
+vnoremap <Tab> >gv
+
+" Indent left and stay in visual mode
+vnoremap <S-Tab> <gv
+
+" Copy to system in visual mode with Ctrl+C
+vnoremap <C-c> "+y
+
+" ============================
+" Python Execution
+" ============================
+augroup PythonExecution
+    autocmd!
+    " Execute Python file with F9 in normal mode
+    autocmd FileType python noremap <buffer> <F9> <Esc>:w<CR>:exec '!python3' shellescape(@%, 1)<CR>
+    
+    " Execute Python file with F9 in insert mode
+    autocmd FileType python inoremap <buffer> <F9> <Esc>:w<CR>:exec '!python3' shellescape(@%, 1)<CR>
+augroup END

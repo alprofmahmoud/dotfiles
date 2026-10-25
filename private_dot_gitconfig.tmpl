@@ -1,0 +1,22 @@
+[core]
+	editor = nvim
+[alias]
+	st = status
+	cm = commit -m
+	bd = branch -d
+[color]
+  ui = auto
+[init]
+	defaultBranch = main
+[user]
+	email = 35482927+alprofmahmoud@users.noreply.github.com
+	name = {{ .chezmoi.username  }}
+	signingkey = {{ .chezmoi.homeDir }}/.ssh/id_ed25519_github_signing_zbook_debian.pub
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
+[tag]
+	gpgsign = true
+[gpg "ssh"]
+	allowedSignersFile = {{ .chezmoi.homeDir }}/.ssh/allowed_signers

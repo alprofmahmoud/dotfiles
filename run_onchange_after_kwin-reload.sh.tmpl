@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# kwinrulesrc hash: {{ include "private_dot_config/private_kwinrulesrc" | sha256sum }}
+# Reload KWin so the window rules take effect (no-op if KDE isn't running)
+
+# Pick whichever qdbus binary exists (Plasma 6 vs 5)
+for bin in qdbus6 qdbus qdbus-qt5; do
+  if command -v "$bin" >/dev/null 2>&1; then
+    "$bin" org.kde.KWin /KWin reconfigure 2>/dev/null || true
+    exit 0
+  fi
+done
+
+exit 0

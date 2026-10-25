@@ -1,0 +1,17 @@
+Host *
+    KexAlgorithms curve25519-sha256,ecdh-sha2-nistp256
+
+# Github
+Host github.com
+    User git
+    IdentityFile {{ .chezmoi.homeDir }}/.ssh/id_ed25519_github_auth_zbook.pub
+    IdentitiesOnly yes
+    StrictHostKeyChecking accept-new
+
+# Any Devices that are SSH enabled
+Host ${HOST_NAME}
+    HostName ${IP_HOST}
+    User ${USER_NAME}
+    Port ${SSH_PORT}
+    IdentityFile {{ .chezmoi.homeDir }}/.ssh/id_ed25519_zbook_debian.pub
+    IdentitiesOnly yes

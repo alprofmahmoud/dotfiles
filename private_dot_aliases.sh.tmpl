@@ -1,0 +1,60 @@
+{{- if eq .environment "termux" -}}
+alias vi="nvim"
+alias debian-proot='proot-distro login debian --user geo192 --hostname "denian-host" --isolated'
+alias void-proot='proot-distro login void --user neotr --hostname "void-host" --isolated'
+alias ubuntu-proot='proot-distro login ubuntu --user ubuntu --hostname "ubuntu-host" --isolated'
+alias fedora-proot='proot-distro login fedora --user fedora-proot --hostname "fedora-host" --isolated'
+alias arch-proot='proot-distro login archlinux --user arch-proot --hostname "arch-host" --isolated'
+alias termux-proot='proot-distro login termux-docker --user u0_a326 --hostname "termux-host" --isolated'
+{{- end }}
+
+{{- if eq .chezmoi.os "linux" -}}
+alias vi="/opt/nvim/bin/nvim"
+export hdd="/media/mahmoud/HDD/"
+alias mounthdd='sudo mount -o uid=1000,gid=1000,fmask=022,dmask=022 UUID="7AE1-EA5D" /mnt/HDD'
+alias mountssd='sudo mount -o uid=1000,gid=1000,fmask=022,dmask=022 UUID="74482A1B4829DD1C" /mnt/SSD'
+alias umounthdd='sudo umount UUID="7AE1-EA5D" /mnt/HDD'
+alias umountssd='sudo umount UUID="74482A1B4829DD1C" /mnt/SSD'
+alias rcp='rsync -ah --progress'
+alias cancelsleep='sudo systemctl kill --signal=SIGTERM laptop-schedule.service && sudo rtcwake -m disable && echo "✅ Sleep cancelled and RTC alarm cleared"'
+alias runsleep='sudo systemctl start laptop-schedule.service && echo "✅ Script started"'
+{{- end }}
+
+# Navigation
+alias ..="cd .."
+alias ...="cd ../.."
+
+# List
+alias ls="lsd"
+alias ll="lsd -lh"
+alias la="lsd -a"
+
+# tmux aliases
+alias t='tmux'
+alias ta='tmux attach -t'               # tmux attach -t session_name
+alias tn='tmux new -A -s'               # tmux new -s session_name
+alias tl='tmux ls'                      # list sessions
+alias tk='tmux kill-session -t'         # tmux kill-session -t session_name
+alias tka='tmux kill-server'            # kill all sessions
+
+# Global
+alias cls="clear"
+alias myip="curl ifconfig.me"
+alias rmf="rm -rfI"
+alias wget='wget -c -P ~/Downloads'
+alias ccd='chezmoi cd'
+alias gis='git status'
+
+# Human readable size files
+alias df="df -h"
+alias du="du -h"
+alias free="free -h"
+
+# Print PATH line line
+alias path='echo -e ${PATH//:/}'
+
+# Uptime
+alias uptime="uptime -p"
+
+# alias for editing with sudo
+alias se='sudoedit'

@@ -1,0 +1,48 @@
+{{ if eq .chezmoi.os "android" -}}
+-- Termux: use termux-clipboard-set/get (no size limit)
+vim.g.clipboard = {
+  name = "termux-clipboard",
+  copy = {
+    ["+"] = "termux-clipboard-set",
+    ["*"] = "termux-clipboard-set",
+  },
+  paste = {
+    ["+"] = "termux-clipboard-get",
+    ["*"] = "termux-clipboard-get",
+  },
+  cache_enabled = 0,
+}
+{{ else -}}
+-- Linux: reset to Neovim default (xclip/xsel auto-detected)
+vim.opt.clipboard = "unnamedplus"
+
+if vim.env.SSH_TTY or vim.env.SSH_CONNECTION then
+  local osc52 = require("vim.ui.clipboard.osc52")
+  -- Paste reads from the unnamed register (terminals rarely allow OSC 52 reads)
+  local function paste()
+    return { vim.fn.split(vim.fn.getreg(""), "\n"), vim.fn.getregtype("") }
+  end
+  vim.g.clipboard = {
+    name = "OSC 52",
+    copy = {
+      ["+"] = osc52.copy("+"),
+      ["*"] = osc52.copy("*"),
+    },
+    paste = {
+      ["+"] = paste,
+      ["*"] = paste,
+    },
+  }
+end
+{{ end -}}
+
+-- Paste mode: F3 enters insert with paste, Esc exits and disables
+vim.keymap.set('n', '<F3>', function()
+    vim.opt.paste = true
+    vim.cmd('startinsert')
+end)
+
+vim.keymap.set('i', '<Esc>', function()
+    vim.opt.paste = false
+    vim.cmd('stopinsert')
+end)

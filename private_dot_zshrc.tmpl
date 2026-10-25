@@ -1,0 +1,152 @@
+# ============================================
+# ZSH Configuration (chezmoi template)
+# ============================================
+# Order: locale/env/PATH -> Oh My Zsh -> history -> fzf -> atuin -> zoxide -> aliases -> welcome
+
+# ============================================
+# 1. Locale, Environment, PATH
+# ============================================
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+
+# --- PATH helpers ---
+# Append a directory to a colon-separated variable, only if not already present.
+# Usage: append_path VAR_NAME DIR [DEFAULT_VALUE]
+append_path() {
+    _ap_var=$1
+    _ap_dir=$2
+    _ap_default=$3
+
+    eval "_ap_cur=\${$_ap_var:-\$_ap_default}"
+
+    case ":$_ap_cur:" in
+        *":$_ap_dir:"*) ;;  # already present, do nothing
+        *)
+            if [ -n "$_ap_cur" ]; then
+                export "$_ap_var=$_ap_cur:$_ap_dir"
+            else
+                export "$_ap_var=$_ap_dir"
+            fi
+            ;;
+    esac
+
+    unset _ap_var _ap_dir _ap_default _ap_cur
+}
+
+# Prepend a directory to a colon-separated variable, only if not already present.
+# Usage: prepend_path VAR_NAME DIR [DEFAULT_VALUE]
+prepend_path() {
+    _pp_var=$1
+    _pp_dir=$2
+    _pp_default=$3
+
+    eval "_pp_cur=\${$_pp_var:-\$_pp_default}"
+
+    case ":$_pp_cur:" in
+        *":$_pp_dir:"*) ;;  # already present, do nothing
+        *)
+            if [ -n "$_pp_cur" ]; then
+                export "$_pp_var=$_pp_dir:$_pp_cur"
+            else
+                export "$_pp_var=$_pp_dir"
+            fi
+            ;;
+    esac
+
+    unset _pp_var _pp_dir _pp_default _pp_cur
+}
+
+# --- Editor ---
+export EDITOR=nvim
+export VISUAL=nvim
+export SUDO_EDITOR=nvim
+
+# --- PATH ---
+append_path PATH "$HOME/.local/bin"
+append_path PATH "$HOME/.atuin/bin"
+{{- if eq .chezmoi.os "linux" }}
+
+# Debian only
+export LIBVIRT_DEFAULT_URI=qemu:///system
+append_path PATH "/sbin"
+append_path PATH "/usr/sbin"
+append_path PATH "/opt/platform-tools"
+prepend_path PATH "/opt/node/bin"
+
+# Flatpak: system dir first, then user dir (user dir ends up first)
+prepend_path XDG_DATA_DIRS "/var/lib/flatpak/exports/share" "/usr/local/share:/usr/share"
+prepend_path XDG_DATA_DIRS "$HOME/.local/share/flatpak/exports/share"
+{{- end }}
+
+# Deno (adds ~/.deno/bin to PATH)
+[ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
+
+# ============================================
+# 2. Oh My Zsh (settings must come BEFORE the source line)
+# ============================================
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="agnoster"
+plugins=(git sudo zsh-autosuggestions zsh-syntax-highlighting)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=244"
+zstyle ':omz:update' mode auto
+DISABLE_MAGIC_FUNCTIONS="true"
+
+# Completions path (must be before compinit, which runs inside oh-my-zsh.sh)
+fpath=(
+    "$HOME/.local/share/zsh/completions"
+    "$HOME/.zsh/completions"                                # deno
+    "$ZSH/custom/plugins/zsh-completions/src"
+    $fpath
+)
+
+source "$ZSH/oh-my-zsh.sh"
+
+{{- if eq .chezmoi.os "linux" }}
+
+# Command-not-found handler (Debian only)
+[ -r /etc/zsh_command_not_found ] && . /etc/zsh_command_not_found
+{{- end }}
+
+# ============================================
+# 3. History
+# ============================================
+# Atuin owns the history. These must come AFTER oh-my-zsh.sh because
+# oh-my-zsh re-sets HISTFILE and raises HISTSIZE to 50000.
+unset HISTFILE
+HISTSIZE=10000
+setopt HIST_IGNORE_SPACE    # Skip commands starting with space
+
+# ============================================
+# 4. fzf (must come after oh-my-zsh)
+# ============================================
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# ============================================
+# 5. Atuin (host id, autosuggest strategy, Ctrl+R / Up / Down widgets)
+# ============================================
+[ -f "$HOME/.config/zsh/atuin.zsh" ] && source "$HOME/.config/zsh/atuin.zsh"
+
+# ============================================
+# 6. Zoxide - Smart cd Replacement
+# ============================================
+if command -v zoxide &>/dev/null; then
+    eval "$(zoxide init zsh)"
+fi
+
+# ============================================
+# 7. Aliases
+# ============================================
+[ -f "$HOME/.aliases.sh" ] && source "$HOME/.aliases.sh"
+alias src="source ~/.zshrc"
+
+# ============================================
+# 8. Welcome Message
+# ============================================
+if [[ -z "$WELCOME_DONE" ]]; then
+  if command -v figlet &>/dev/null && [[ -f "$HOME/.config/big.flf" ]]; then
+    figlet -f "$HOME/.config/big.flf" Prof | head -n -1
+  fi
+  print -P "Hello Pro"
+  print -P "The time is %F{yellow}$(date +%T)%f and this machine is called %F{green}${_ATUIN_HOST_ID}%f"
+  export WELCOME_DONE=1
+fi

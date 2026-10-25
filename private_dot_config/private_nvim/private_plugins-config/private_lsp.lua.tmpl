@@ -1,0 +1,97 @@
+-- ============================
+-- LSP Configuration
+-- ============================
+
+-- Python LSP (pylsp)
+vim.lsp.config('pylsp', {
+    filetypes = { 'python' },
+    root_markers = { 'requirements.txt', 'setup.py', 'pyproject.toml', '.git', '.' },
+    settings = {
+        pylsp = {
+            plugins = {
+                pyflakes = { enabled = true },
+                pycodestyle = { enabled = true },
+                autopep8 = { enabled = false },
+                yapf = { enabled = false },
+                mccabe = { enabled = false },
+            }
+        }
+    }
+})
+vim.lsp.enable('pylsp')
+
+-- Bash LSP
+vim.lsp.config('bashls', {
+    filetypes = { 'sh', 'bash' },
+    root_markers = { '.git', '.' },
+})
+vim.lsp.enable('bashls')
+
+{{- if ne .chezmoi.os "android"  }}
+-- Dart LSP
+vim.lsp.config('dartls', {
+    cmd = { 'dart', 'language-server', '--protocol=lsp' },
+    filetypes = { 'dart' },
+    root_markers = { 'pubspec.yaml' },
+})
+vim.lsp.enable('dartls')
+{{- end }}
+
+-- Vim LSP
+vim.lsp.config('vimls', {
+    cmd = { 'vim-language-server', '--stdio' },
+    filetypes = { 'vim' },
+    root_markers = { 'init.vim', '.git', '.' },
+    init_options = {
+        isNeovim = true,
+        iskeyword = '@,48-57,_,192-255,-#',
+        vimruntime = vim.env.VIMRUNTIME,
+        runtimepath = vim.o.runtimepath,
+        diagnostic = { enable = true },
+        indexes = {
+            runtimepath = true,
+            gap = 100,
+            count = 3,
+        },
+        suggest = {
+            fromVimruntime = true,
+            fromRuntimepath = true,
+        },
+    },
+})
+vim.lsp.enable('vimls')
+vim.diagnostic.config({
+    virtual_text = true,
+    signs = true,
+    underline = true,
+    update_in_insert = false,                  
+})
+-- ============================
+-- Keymaps
+-- ============================
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition)
+vim.keymap.set('n', 'K', vim.lsp.buf.hover)
+vim.keymap.set('n', 'gr', vim.lsp.buf.references)
+vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename)
+vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action)
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
+
+-- Diagnostic float window colors (solarized)
+vim.api.nvim_set_hl(0, 'DiagnosticFloatingError', { fg = '#dc322f', bg = '#002b36' })
+vim.api.nvim_set_hl(0, 'DiagnosticFloatingWarn',  { fg = '#b58900', bg = '#002b36' })
+vim.api.nvim_set_hl(0, 'DiagnosticFloatingInfo',  { fg = '#268bd2', bg = '#002b36' })
+vim.api.nvim_set_hl(0, 'DiagnosticFloatingHint',  { fg = '#2aa198', bg = '#002b36' })
+vim.api.nvim_set_hl(0, 'NormalFloat',             { bg = '#002b36' })
+vim.api.nvim_set_hl(0, 'FloatBorder',             { fg = '#2aa198', bg = '#002b36' })
+
+-- Float window border
+vim.diagnostic.config({
+    virtual_text = true,
+    signs = true,
+    underline = true,
+    update_in_insert = false,
+    float = {
+        border = 'rounded',
+        style = 'minimal',
+    },
+})

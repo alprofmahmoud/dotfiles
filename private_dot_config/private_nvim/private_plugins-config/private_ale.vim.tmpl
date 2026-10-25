@@ -1,0 +1,157 @@
+" ============================
+" ALE (Async Lint Engine) Configuration
+" ============================
+
+" ============================
+" Linters Setup
+" ============================
+" Define which linters to use for each language
+let g:ale_linters = {
+    \ 'python': ['ruff'],
+    \ 'vim': ['vint'],
+    \ 'javascript': ['eslint'],
+    \ 'sh': ['shellcheck'],
+    \ 'bash': ['shellcheck'],
+    \ 'dart': {{ if eq .chezmoi.os "android"}}['dart_analyze']{{ else }}[]{{ end }},
+    \ }
+
+" Add more linters as needed:
+" \ 'ruby': ['rubocop'],
+" \ 'go': ['golint'],
+" \ 'rust': ['cargo'],
+
+" ============================
+" Fixers Setup
+" ============================
+let g:ale_fixers = {
+    \ 'python': ['ruff', 'ruff_format'],
+    \ 'sh':     ['shfmt'],
+    \ 'bash':   ['shfmt'],
+    \ 'dart':{{ if eq .chezmoi.os "android"}}['dart_format']{{ else }}[]{{ end }},
+    \ }
+
+let g:ale_python_ruff_use_global = 1
+let g:ale_vim_vint_use_global    = 1
+
+" ============================
+" Checking Settings
+" ============================
+" When to run linting
+let g:ale_lint_on_save = 1
+let g:ale_lint_on_text_changed = 0
+let g:ale_lint_on_enter = 1
+let g:ale_lint_on_insert_leave = 0
+
+" Disable ALE completion - LSP handles this
+let g:ale_completion_enabled = 0
+
+" ============================
+" Error List Settings
+" ============================
+" Automatically display error list
+let g:ale_open_list = 0
+
+" Error list window size
+let g:ale_list_window_size = 5
+
+" Markdownlint global config path
+let g:ale_markdown_markdownlint_options = '--config {{ .chezmoi.homeDir }}/.markdownlint.json'
+" ============================
+" Error Message Formatting
+" ============================
+" How error messages are displayed
+let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+
+" Example output: [flake8] line too long [warning]
+
+" ============================
+" Visual Indicators
+" ============================
+" Display errors in sidebar with signs
+let g:ale_sign_error = '✘'
+let g:ale_sign_warning = '⚠'
+
+" Alternative signs (if symbols don't work):
+" let g:ale_sign_error = 'E'
+" let g:ale_sign_warning = 'W'
+" ============================
+" ruff Settings
+" ============================
+" If you have pyproject.toml or ruff.toml, ruff reads them automatically
+" You can specify rules manually here if needed:
+let g:ale_python_ruff_options = '--select E,W,F,I'
+
+" ============================
+" Disable linting on chezmoi templates
+" ============================
+" .tmpl files mix Go template syntax with shell/other langs,
+" which breaks shellcheck's brace/quote parsing
+let g:ale_pattern_options = {
+    \ '\.tmpl$': {'ale_linters': [], 'ale_fixers': []},
+    \ }
+let g:ale_pattern_options_enabled = 1
+
+" ============================
+" shellcheck Settings
+" ============================
+" Ignore SC1090: can't follow non-constant source
+" Ignore SC2034: variable appears unused
+let g:ale_sh_shellcheck_options = '-e SC1090,SC2034'
+" ============================
+" Vint Settings (for Vim files)
+" ============================
+" Ignore some vint style warnings
+let g:ale_vim_vint_show_style_issues = 0
+let g:ale_vim_vint_options = '--enable-neovim'
+
+" ============================
+" Navigation Shortcuts
+" ============================
+" Jump to next error
+nmap <silent> <leader>aj :ALENext<CR>
+
+" Jump to previous error
+nmap <silent> <leader>ak :ALEPrevious<CR>
+
+" Show error details
+nmap <silent> <leader>ad :ALEDetail<CR>
+
+" ============================
+" File Type Specific Shortcuts
+" ============================
+augroup ALEShortcuts
+    autocmd!
+    " Press F4 to manually run linting in Python files
+    autocmd FileType python nnoremap <buffer> <F4> :ALELint<CR>
+    
+    " Press F4 to manually run linting in Vim files
+    autocmd FileType vim nnoremap <buffer> <F4> :ALELint<CR>
+    
+    " Press q to close quickfix window
+    autocmd FileType qf nnoremap <buffer> q :q<CR>
+augroup END
+
+" ============================
+" Manual Vint Checker Command
+" ============================
+" Alternative manual checker if ALE doesn't work
+nmap <silent> <F6> :ALELint<CR>
+
+" ============================
+" Additional Settings (Optional)
+" ============================
+" Fix files automatically on save
+" let g:ale_fix_on_save = 1
+
+" Define fixers
+" let g:ale_fixers = {
+"     \ 'python': ['black', 'isort'],
+"     \ 'javascript': ['prettier', 'eslint'],
+"     \ }
+
+" Show errors in virtual text (nvim 0.3.2+)
+" let g:ale_virtualtext_cursor = 1
+
+" Customize sign column colors
+" highlight ALEErrorSign ctermfg=red
+" highlight ALEWarningSign ctermfg=yellow

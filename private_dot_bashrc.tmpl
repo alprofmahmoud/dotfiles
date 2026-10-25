@@ -1,0 +1,166 @@
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=5000
+HISTFILESIZE=10000
+
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+{{- if eq .environment "termux" }}
+# ... termux
+# Aliases
+alias pkgi="pkg install"
+alias pkgrm="pkg remove"
+
+# Variable in system
+PS1='\[\e[31m\][\[\e[m\]\[\e[38;5;172m\]\u\[\e[m\]@\[\e[38;5;153m\]\h\[\e[m\] \[\e[38;5;214m\]\W\[\e[m\]\[\e[31m\]]\[\e[m\]\\$ '
+# [u0_a368@localhost ~]$
+
+# Bash Completion
+if [ -f /data/data/com.termux/files/usr/share/bash-completion/bash_completion ]; then
+    . /data/data/com.termux/files/usr/share/bash-completion/bash_completion
+fi
+
+{{- else if eq .environment "debian" }}
+# ... debian
+
+# set variable identifying the chroot you work in (used in the prompt below)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# apt shortcuts
+alias update="sudo apt update && sudo apt upgrade -y"
+alias install="sudo apt install"
+alias remove="sudo apt remove"
+alias search="apt search"
+alias autoremove="sudo apt autoremove -y"
+
+{{- else }}
+# Unknown environment - simple configurations
+
+{{- end }}
+
+{{- if eq  .chezmoi.os "linux" }}
+# ... linux
+
+# set a fancy prompt (non-color, unless we know we "want" color)
+case "$TERM" in
+    xterm-color|*-256color) color_prompt=yes;;
+esac
+
+# uncomment for a colored prompt, if the terminal has the capability; turned
+# off by default to not distract the user: the focus in a terminal window
+# should be on the output of commands, not on the prompt
+#force_color_prompt=yes
+
+if [ -n "$force_color_prompt" ]; then
+    if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+	# We have color support; assume it's compliant with Ecma-48
+	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+	# a case would tend to support setf rather than setaf.)
+	color_prompt=yes
+    else
+	color_prompt=
+    fi
+fi
+
+if [ "$color_prompt" = yes ]; then
+    	PS1='\[\033[0;31m\]\342\224\214\342\224\200$([[ $? != 0 ]] && echo "[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200")[\[\033[0;39m\]\u\[\033[01;33m\]@\[\033[01;96m\]\h\[\033[0;31m\]]\342\224\200[\[\033[0;32m\]\w\[\033[0;31m\]]\n\[\033[0;31m\]\342\224\224\342\224\200\342\224\200\342\225\274 \[\033[0m\]\[\e[01;33m\]ƒ \[\e[0m\]'
+	    #PS1="\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$"
+else
+      # PS1='┌──[\u@\h]─[\w]\n└──╼ \$ '
+      PS1='\[\e]0;\u@\h: \w\a\]\[\033[0;31m\]\342\224\214\342\224\200$([[ $? != 0 ]] && echo "[\[\033[0;31m\]\342\234\227\[\033[0;37m\]]\342\224\200")[\[\033[0;39m\]\u\[\033[01;33m\]@\[\033[01;96m\]\h\[\033[0;31m\]]\342\224\200[\[\033[0;32m\]\w\[\033[0;31m\]]\n\[\033[0;31m\]\342\224\224\342\224\200\342\224\200\342\225\274 \[\033[0m\]\[\e[01;33m\]ƒ \[\e[0m\]'
+      # PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+unset color_prompt force_color_prompt
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if ! shopt -oq posix; then
+  if [ -f /usr/share/bash-completion/bash_completion ]; then
+    . /usr/share/bash-completion/bash_completion
+  elif [ -f /etc/bash_completion ]; then
+    . /etc/bash_completion
+  fi
+fi
+
+{{- end }}
+
+# Initialize zoxide (smart cd replacement) if installed
+if command -v zoxide &>/dev/null; then
+      eval "$(zoxide init bash)"
+fi
+
+# Initialize atuin
+[[ -f ~/.bash-preexec.sh  ]] && source ~/.bash-preexec.sh
+if [[ $- == *i* ]] && command -v atuin &>/dev/null; then
+    eval "$(atuin init bash)"
+fi
+
+. "$HOME/.atuin/bin/env"
+
+# ============================
+# FZF Configuration
+# ============================
+# Load fzf keybindings and completion
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# Default options
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+
+# File search (Ctrl+T)
+export FZF_DEFAULT_COMMAND="fdfind --type f --hidden --follow"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+
+# Directory search (Alt+C)
+export FZF_ALT_C_COMMAND="fdfind --type d --hidden --follow"
+
+# Custom keybinding Ctrl+F for file search
+bind '"\C-f": " \C-u \C-a\C-k`__fzf_select__`\e\C-e\C-y\C-a\C-y\ey\C-h\C-e\er \C-h"'
+
+# Alias definitions.
+[ -f {{ .chezmoi.homeDir }}/.aliases.sh ] && source {{ .chezmoi.homeDir }}/.aliases.sh
+alias src="source ~/.bashrc 2>/dev/null || source ~/.zshrc"
+
+# Defult editor
+export EDITOR=nvim
+export VISUAL=nvim
+
+# Add user local binaries to PATH (chezmoi etc.)
+export PATH="{{ .chezmoi.homeDir  }}/.local/bin:$PATH"
+
+if [ -z "$WELCOME_DONE" ]; then
+    figlet -f {{ .chezmoi.homeDir }}/.config/big.flf "Pro" | head -n -2
+    echo "Hello Pro"
+    echo -e "The time is \e[33m$(date +%T)\e[0m and this machine is called \e[32m$(hostname)\e[0m"
+    export WELCOME_DONE=1
+fi

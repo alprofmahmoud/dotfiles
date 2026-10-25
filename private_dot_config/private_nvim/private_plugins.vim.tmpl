@@ -1,0 +1,127 @@
+" ============================
+" Vim-Plug Plugin Manager
+" ============================
+
+call plug#begin('{{ .chezmoi.homeDir }}/.config/nvim/plugged')
+
+" ============================
+" Core Enhancements (All Platforms)
+" ============================
+    Plug 'tpope/vim-sensible'
+    Plug 'jiangmiao/auto-pairs'
+    Plug 'tpope/vim-commentary'
+    Plug 'tpope/vim-surround'
+    Plug 'tpope/vim-repeat'
+
+" ============================
+" UI & Appearance (All Platforms)
+" ============================
+    Plug 'nvim-lualine/lualine.nvim'
+    Plug 'morhetz/gruvbox'
+    Plug 'lifepillar/vim-solarized8'
+    Plug 'nvim-tree/nvim-web-devicons'
+    Plug 'onsails/lspkind.nvim'
+    Plug 'lukas-reineke/indent-blankline.nvim'
+    Plug 'akinsho/bufferline.nvim', { 'tag': '*' }
+
+" ============================
+" Git Integration (All Platforms)
+" ============================
+    Plug 'nvim-lua/plenary.nvim'
+    Plug 'sindrets/diffview.nvim'
+    Plug 'NeogitOrg/neogit'
+    Plug 'lewis6991/gitsigns.nvim'
+
+" ============================
+" Code Quality (All Platforms)
+" ============================
+    Plug 'dense-analysis/ale'
+
+" ============================
+" LSP & Completion (All Platforms)
+" ============================
+    Plug 'neovim/nvim-lspconfig'
+    " Completion Engine
+    Plug 'hrsh7th/nvim-cmp'
+    " Completion Sources
+    Plug 'hrsh7th/cmp-buffer'
+    Plug 'hrsh7th/cmp-path'
+    Plug 'hrsh7th/cmp-nvim-lsp'
+    Plug 'hrsh7th/cmp-cmdline'
+    " Snippets
+    Plug 'hrsh7th/vim-vsnip'
+    Plug 'hrsh7th/cmp-vsnip'
+
+" ============================
+" Language Support (All Platforms)
+" ============================
+    Plug 'godlygeek/tabular'
+    Plug 'vim-python/python-syntax'
+    Plug 'pangloss/vim-javascript'
+    Plug 'leafgarland/typescript-vim'
+    Plug 'mattn/emmet-vim'
+    Plug 'ap/vim-css-color'
+    Plug 'elzr/vim-json'
+    Plug 'dart-lang/dart-vim-plugin'
+    Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && npx --yes yarn install' }
+    Plug 'instant-markdown/vim-instant-markdown', {'for': 'markdown', 'do': 'yarn install'}
+
+" ============================
+" Productivity (All Platforms)
+" ============================
+    Plug 'romainl/vim-qf'
+    Plug 'tpope/vim-obsession'
+    Plug 'junegunn/goyo.vim'
+    Plug 'alker0/chezmoi.vim'
+
+" ============================
+" File Navigation (Not Android)
+" ============================
+{{ if ne .chezmoi.os "android" }}
+    Plug 'nvim-tree/nvim-tree.lua'
+    Plug 'github/copilot.vim'
+    Plug 'akinsho/flutter-tools.nvim'
+    Plug 'Exafunction/codeium.vim'
+{{ end }}
+
+" ============================
+" Termux Only
+" ============================
+{{ if eq .chezmoi.os "android" }}
+    Plug 'matze/vim-move'
+    Plug 'WolfgangMehner/bash-support'
+    Plug 'preservim/nerdtree'
+    Plug 'ryanoasis/vim-devicons'
+{{ end }}
+
+" ============================
+" Linux Only
+" ============================
+{{ if eq .chezmoi.os "linux" }}
+    Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+    Plug 'junegunn/fzf.vim'
+    Plug 'mileszs/ack.vim'
+    Plug 'airblade/vim-gitgutter'
+    Plug 'WolfgangMehner/bash-support'
+    Plug 'stephpy/vim-yaml'
+    Plug '907th/vim-auto-save'
+    Plug 'liuchengxu/vim-which-key'
+    Plug 'junegunn/limelight.vim'
+    Plug 'matze/vim-move'
+{{ end }}
+
+" ============================
+" Windows Only
+" ============================
+{{ if eq .chezmoi.os "windows" }}
+    Plug 'liuchengxu/vim-which-key'
+    Plug '907th/vim-auto-save'
+{{ end }}
+
+call plug#end()
+
+" ============================
+" Enable file type detection
+" ============================
+filetype plugin indent on
+syntax enable

@@ -1,0 +1,237 @@
+{
+    "details": {
+        "prefix": "details",
+        "body": ["<details>", "<summary>$1</summary>", "", "$2", "</details>"],
+        "description": "Details block"
+    },
+    "details-open": {
+        "prefix": "detailsopen",
+        "body": ["<details open>", "<summary>$1</summary>", "", "$2", "</details>"],
+        "description": "Details block (open by default)"
+    },
+    "summary": {
+        "prefix": "summary",
+        "body": "<summary>$1</summary>",
+        "description": "Summary"
+    },
+    "kbd": {
+        "prefix": "kbd",
+        "body": "<kbd>$1</kbd>",
+        "description": "Keyboard key"
+    },
+    "mark": {
+        "prefix": "mark",
+        "body": "<mark>$1</mark>",
+        "description": "Highlight text"
+    },
+    "sub": {
+        "prefix": "sub",
+        "body": "<sub>$1</sub>",
+        "description": "Subscript"
+    },
+    "sup": {
+        "prefix": "sup",
+        "body": "<sup>$1</sup>",
+        "description": "Superscript"
+    },
+    "br": {
+        "prefix": "br",
+        "body": "<br>",
+        "description": "Line break"
+    },
+    "hr": {
+        "prefix": "hr",
+        "body": "---",
+        "description": "Horizontal rule"
+    },
+    "abbr": {
+        "prefix": "abbr",
+        "body": "<abbr title=\"$1\">$2</abbr>",
+        "description": "Abbreviation"
+    },
+    "div-center": {
+        "prefix": "center",
+        "body": ["<div align=\"center\">", "", "$1", "", "</div>"],
+        "description": "Center content"
+    },
+    "div-align": {
+        "prefix": "div",
+        "body": ["<div align=\"$1\">", "", "$2", "", "</div>"],
+        "description": "Div with align"
+    },
+    "img-html": {
+        "prefix": "imgh",
+        "body": "<img src=\"$1\" width=\"$2\" align=\"$3\">",
+        "description": "Image with HTML"
+    },
+    "span": {
+        "prefix": "span",
+        "body": "<span>$1</span>",
+        "description": "Span"
+    },
+    "blockquote": {
+        "prefix": "bq",
+        "body": "> $1",
+        "description": "Blockquote"
+    },
+    "blockquote-note": {
+        "prefix": "note",
+        "body": "> [!NOTE]\n> $1",
+        "description": "GitHub Note blockquote"
+    },
+    "blockquote-warning": {
+        "prefix": "warning",
+        "body": "> [!WARNING]\n> $1",
+        "description": "GitHub Warning blockquote"
+    },
+    "blockquote-tip": {
+        "prefix": "tip",
+        "body": "> [!TIP]\n> $1",
+        "description": "GitHub Tip blockquote"
+    },
+    "blockquote-important": {
+        "prefix": "important",
+        "body": "> [!IMPORTANT]\n> $1",
+        "description": "GitHub Important blockquote"
+    },
+    "blockquote-caution": {
+        "prefix": "caution",
+        "body": "> [!CAUTION]\n> $1",
+        "description": "GitHub Caution blockquote"
+    },
+    "codeblock": {
+        "prefix": "cb",
+        "body": ["```$1", "$2", "```"],
+        "description": "Code block"
+    },
+    "inline-code": {
+        "prefix": "ic",
+        "body": "`$1`",
+        "description": "Inline code"
+    },
+    "table": {
+        "prefix": "table",
+        "body": ["| $1 | $2 | $3 |", "|---|---|---|", "| $4 | $5 | $6 |"],
+        "description": "Table"
+    },
+    "table-align": {
+        "prefix": "tablea",
+        "body": ["| $1 | $2 | $3 |", "|:---|:---:|---:|", "| $4 | $5 | $6 |"],
+        "description": "Table with alignment"
+    },
+    "link": {
+        "prefix": "link",
+        "body": "[$1]($2)",
+        "description": "Link"
+    },
+    "link-title": {
+        "prefix": "linkt",
+        "body": "[$1]($2 \"$3\")",
+        "description": "Link with title"
+    },
+    "image": {
+        "prefix": "img",
+        "body": "![$1]($2)",
+        "description": "Image"
+    },
+    "image-link": {
+        "prefix": "imgl",
+        "body": "[![$1]($2)]($3)",
+        "description": "Image with link"
+    },
+    "bold": {
+        "prefix": "bold",
+        "body": "**$1**",
+        "description": "Bold"
+    },
+    "italic": {
+        "prefix": "italic",
+        "body": "_$1_",
+        "description": "Italic"
+    },
+    "bold-italic": {
+        "prefix": "bi",
+        "body": "***$1***",
+        "description": "Bold and Italic"
+    },
+    "strikethrough": {
+        "prefix": "strike",
+        "body": "~~$1~~",
+        "description": "Strikethrough"
+    },
+    "task": {
+        "prefix": "task",
+        "body": "- [ ] $1",
+        "description": "Task item unchecked"
+    },
+    "task-done": {
+        "prefix": "taskd",
+        "body": "- [x] $1",
+        "description": "Task item checked"
+    },
+    "heading1": {
+        "prefix": "h1",
+        "body": "# $1",
+        "description": "Heading 1"
+    },
+    "heading2": {
+        "prefix": "h2",
+        "body": "## $1",
+        "description": "Heading 2"
+    },
+    "heading3": {
+        "prefix": "h3",
+        "body": "### $1",
+        "description": "Heading 3"
+    },
+    "heading4": {
+        "prefix": "h4",
+        "body": "#### $1",
+        "description": "Heading 4"
+    },
+    "heading5": {
+        "prefix": "h5",
+        "body": "##### $1",
+        "description": "Heading 5"
+    },
+    "heading6": {
+        "prefix": "h6",
+        "body": "###### $1",
+        "description": "Heading 6"
+    },
+    "footnote": {
+        "prefix": "fn",
+        "body": "Here is a footnote[^$1].\n\n[^$1]: $2",
+        "description": "Footnote"
+    },
+    "badge": {
+        "prefix": "badge",
+        "body": "![${1:label}](https://img.shields.io/badge/$2-$3-$4)",
+        "description": "Shield badge"
+    },
+    "toc": {
+        "prefix": "toc",
+        "body": ["## Table of Contents", "", "- [$1](#$2)"],
+        "description": "Table of Contents"
+    },
+    "comment": {
+        "prefix": "comment",
+        "body": "<!-- $1 -->",
+        "description": "HTML comment"
+    },
+    "emoji": {
+        "prefix": "emoji",
+        "body": ":$1:",
+        "description": "Emoji shortcode"
+    },
+    "mention": {
+        "prefix": "mention",
+        "body": "@$1",
+        "description": "Mention user"
+    },
+    "issue": {
+        "prefix": "issue",
+        "body": "#$1",
+        "description": "Reference issue"
+    }
+}
