@@ -67,7 +67,14 @@ append_path PATH "$HOME/.atuin/bin"
 {{- if eq .chezmoi.os "linux" }}
 
 # Debian only
+# libvirt: connect to the system-wide daemon by default (virsh, virt-manager)
 export LIBVIRT_DEFAULT_URI=qemu:///system
+
+# Use the systemd user ssh-agent socket (linux only; Termux has no systemd)
+export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+
+# --- PATH additions below (appended at the end, so lower priority) ---
+# System admin binaries (needed for non-root users on Debian)
 append_path PATH "/sbin"
 append_path PATH "/usr/sbin"
 append_path PATH "/opt/platform-tools"

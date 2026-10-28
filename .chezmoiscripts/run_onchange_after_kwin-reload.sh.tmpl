@@ -1,3 +1,4 @@
+{{- if ne .chezmoi.os "windows" -}}
 #!/usr/bin/env bash
 # kwinrulesrc hash: {{ include "private_dot_config/private_kwinrulesrc" | sha256sum }}
 # Reload KWin so the window rules take effect (no-op if KDE isn't running)
@@ -11,3 +12,4 @@ for bin in qdbus6 qdbus qdbus-qt5; do
 done
 
 exit 0
+{{- end}}
