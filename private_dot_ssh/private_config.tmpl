@@ -4,14 +4,14 @@ Host *
 # Github
 Host github.com
     User git
-    IdentityFile {{ .chezmoi.homeDir }}/.ssh/id_ed25519_github_auth_zbook.pub
+    IdentityFile {{ .chezmoi.homeDir }}/.ssh/id_ed25519_github_auth_{{ .chezmoi.hostname }}.pub
     IdentitiesOnly yes
     StrictHostKeyChecking accept-new
 
 # Any Devices that are SSH enabled
-Host ${HOST_NAME}
+Host ${HOST_ALIAS}
     HostName ${IP_HOST}
     User ${USER_NAME}
     Port ${SSH_PORT}
-    IdentityFile {{ .chezmoi.homeDir }}/.ssh/id_ed25519_zbook_debian.pub
+    IdentityFile {{ .chezmoi.homeDir }}/.ssh/id_ed25519_{{ .chezmoi.hostname }}.pub
     IdentitiesOnly yes
