@@ -1,0 +1,51 @@
+{{- $nvimdir := printf "%s/.config/nvim" .chezmoi.homeDir }}
+
+{{- $pluginsdir := printf "%s/plugins-config" $nvimdir }}
+{{- if eq .chezmoi.os "windows" }}
+{{-   $nvimdir = printf "%s/AppData/Local/nvim" .chezmoi.homeDir }}
+{{-   $pluginsdir = printf "%s\\plugins-config" $nvimdir }}
+{{- end }}
+{{- if eq .chezmoi.os "windows" }}
+[scriptEnv]
+    TMP  = {{ printf "%s/AppData/Local/Temp" .chezmoi.homeDir | replace "/" "\\" | quote }}
+    TEMP = {{ printf "%s/AppData/Local/Temp" .chezmoi.homeDir | replace "/" "\\" | quote }}
+{{- end }}
+[data]
+{{- if eq .chezmoi.os "android" }}
+  {{- if not .chezmoi.osRelease }}
+  environment = "termux"
+  distro      = "termux"
+  {{- else }}
+  environment = {{ .chezmoi.osRelease.id | quote }}
+  distro      = {{ .chezmoi.osRelease.id | quote }}
+  {{- end }}
+
+{{- else if eq .chezmoi.os "linux" }}
+  environment = {{ .chezmoi.osRelease.id | quote }}
+  distro      = {{ .chezmoi.osRelease.id | quote }}
+
+{{- else if eq .chezmoi.os "windows" }}
+    environment = "windows"
+    distro      = "windows"
+{{- else }}
+  environment = {{ .chezmoi.os | quote }}
+  distro      = {{ .chezmoi.os | quote }}
+{{- end }}
+
+  nvimdir    = {{ $nvimdir | quote }}
+  pluginsdir = {{ $pluginsdir | quote }}
+
+{{- if eq .chezmoi.os "windows" }}
+  windir_profile = {{ printf "%s\\Documents\\PowerShell" .chezmoi.homeDir | quote }}
+{{- end }}
+
+{{- if eq .chezmoi.os "windows" }}
+# Run .ps1 scripts with pwsh (must be installed before first apply)
+[interpreters.ps1]
+    command = "pwsh"
+    args = ["-NoLogo", "-NoProfile"]
+{{- else }}
+[cd]
+  command = {{ env "SHELL" | quote  }}
+{{- end }}
+
