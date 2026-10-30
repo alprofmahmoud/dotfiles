@@ -1,0 +1,58 @@
+# ============================
+# Files not needed outside Termux
+# ============================
+{{- if ne .environment "termux" }}
+.config/nvim/termux.vim
+.termux
+.ssh/id_ed25519*_termux-a24.pub
+{{- end }}
+
+# ============================
+# Files not needed outside GNU/Linux or Termux
+# ============================
+{{- if and (ne .chezmoi.os "linux") (ne .environment "termux") }}
+vint-wrapper.sh
+.zshrc
+.bashrc
+.aliases.sh
+.config/fish/
+.config/zsh
+.config/atuin
+.oh-my-zsh
+.tmux.conf
+{{- end }}
+
+# ============================
+# Files not needed outside GNU/Linux only
+# ============================
+{{- if ne .chezmoi.os "linux" }}
+.config/kwinrulesrc
+shortcut_kde.kksrc
+{{- end }}
+
+# ============================
+# Files not needed outside Debian-based
+# ============================
+{{- if not (or (eq .distro "debian") (eq .distro "ubuntu")) }}
+.config/nvim/debian.vim
+.config/nvim/plugins-config/copilot.vim
+.ssh/id_ed25519*zbook-debian.pub
+{{- end }}
+
+# ============================
+# Files not needed outside VoidLinux
+# ============================
+{{- if ne .distro "void" }}
+.config/nvim/voidlinux.vim
+{{- end }}
+
+# ============================
+# Files not needed outside Windows
+# ============================
+{{- if ne .environment "windows" }}
+.config/nvim/windows.vim
+AppData
+Documents
+.config/powershell
+.ssh/id_ed25519*_zbook-windows.pub
+{{- end }}

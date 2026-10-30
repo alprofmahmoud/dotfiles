@@ -1,0 +1,21 @@
+{{- $fontDir := "" -}}
+{{- if eq .chezmoi.os "linux" -}}
+  {{- $fontDir = ".local/share/fonts/Hack" -}}
+{{- else if eq .chezmoi.os "windows" -}}
+  {{- $fontDir = "AppData/Local/Microsoft/Windows/Fonts/Hack" -}}
+{{- else if eq .chezmoi.os "android" -}}
+  {{- $fontDir = ".termux/fonts/Hack" -}}
+{{- end -}}
+
+{{- if $fontDir }}
+["{{ $fontDir }}"]
+    type    = "archive"
+    url     = "https://github.com/ryanoasis/nerd-fonts/releases/download/{{ .nerdFontsVersion }}/Hack.zip"
+    include = ["HackNerdFont-*.ttf"]
+{{- end }}
+
+{{- if ne .chezmoi.os "windows" }}
+[".local/share/figlet/big.flf"]
+    type = "file"
+    url  = "https://www.figlet.org/fonts/big.flf"
+{{- end }}
