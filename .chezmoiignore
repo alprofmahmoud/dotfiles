@@ -28,6 +28,7 @@ vint-wrapper.sh
 {{- if ne .chezmoi.os "linux" }}
 .config/kwinrulesrc
 shortcut_kde.kksrc
+.config/kitty
 {{- end }}
 
 # ============================
