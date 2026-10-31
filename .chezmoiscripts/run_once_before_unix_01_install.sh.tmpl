@@ -1,0 +1,48 @@
+{{- if ne .chezmoi.os "windows" -}}
+#!{{ lookPath "zsh" }}
+set -e
+# Treat unset variables as an error
+set -o nounset
+
+# 1. Verify prerequisites exist before proceeding
+for cmd in curl git zsh; do
+  if ! command -v "$cmd" >/dev/null 2>&1; then
+    echo "Error: Required command '$cmd' is not installed on this system." >&2
+    exit 1
+  fi
+done
+
+ZSH_CUSTOM="${ZSH_CUSTOM:-{{ .chezmoi.homeDir }}/.oh-my-zsh/custom}"
+
+# 2. Install Oh My Zsh safely
+# -u ZSH: unset only the ZSH variable (it controls the install path), keep the rest of the environment
+# KEEP_ZSHRC=yes: do not back up or overwrite an existing .zshrc (chezmoi manages it)
+if [ ! -f "{{ .chezmoi.homeDir }}/.oh-my-zsh/oh-my-zsh.sh" ]; then
+  echo "Installing Oh My Zsh..."
+  env -u ZSH HOME="{{ .chezmoi.homeDir }}" RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
+# 3. Helper function for clean and robust git cloning with depth=1 (fast & lightweight)
+install_plugin() {
+  local repo_url="$1"
+  local target_dir="$2"
+  
+  if [ ! -d "$target_dir" ]; then
+    echo "Cloning $(basename "$target_dir")..."
+    git clone --depth=1 "$repo_url" "$target_dir" || {
+      echo "Warning: Failed to clone $repo_url. Continuing..." >&2
+    }
+  fi
+}
+
+# 4. Install standard plugins
+install_plugin "https://github.com/zsh-users/zsh-autosuggestions.git" "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+install_plugin "https://github.com/zsh-users/zsh-syntax-highlighting.git" "$ZSH_CUSTOM/plugins/zsh-syntax-highlighting"
+
+# 5. Install conditional container plugin (Flutter development environment)
+{{- if hasPrefix "container" .chezmoi.hostname }}
+install_plugin "https://github.com/zsh-users/zsh-completions.git" "$ZSH_CUSTOM/plugins/zsh-completions"
+{{- end }}
+
+echo "$(basename "$0") finished executing all commands successfully."
+{{- end }}
