@@ -1,0 +1,94 @@
+{{ if ne .chezmoi.os "windows" -}}
+#!{{ lookPath "zsh" }}
+echo "$(basename "$0") started executing all commands"
+set -e
+set -o nounset
+
+HOME_DIR="{{ .chezmoi.homeDir }}"
+
+# 1. Setup autocompletions for chezmoi
+COMPLETIONS_DIR="$HOME_DIR/.local/share/zsh/completions"
+if [ ! -d "$COMPLETIONS_DIR" ]; then
+  mkdir -p "$COMPLETIONS_DIR"
+fi
+
+if [ ! -f "$COMPLETIONS_DIR/_chezmoi" ]; then
+  chezmoi completion zsh > "$COMPLETIONS_DIR/_chezmoi"
+fi
+
+# 2. Check before install Vim-Plug
+VIM_PLUG_PATH="$HOME_DIR/.config/nvim/autoload/plug.vim"
+if [ ! -f "$VIM_PLUG_PATH" ]; then
+  curl -fLo "$VIM_PLUG_PATH" --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
+# 3. Check before git clone (ScriptDownloader)
+if [ ! -d "$HOME_DIR/ScriptDownloader" ]; then
+  git clone git@github-sdownloader:alprofmahmoud/ScriptDownloader.git "$HOME_DIR/ScriptDownloader" || {
+    echo "Warning: Failed to clone ScriptDownloader. Check SSH keys/config." >&2
+  }
+fi
+
+# 4. Install fzf
+if ! command -v fzf >/dev/null 2>&1; then
+  if [ ! -d "$HOME_DIR/.fzf" ]; then
+    git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME_DIR/.fzf"
+    "$HOME_DIR/.fzf/install" --all
+  fi
+fi
+
+# 5. Initialize atuin
+if ! command -v atuin >/dev/null 2>&1; then
+  curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh -s -- --non-interactive
+fi
+
+# 6. SSH authorized_keys setup with permissions
+SSH_DIR="$HOME_DIR/.ssh"
+mkdir -p "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+
+cat > "$SSH_DIR/authorized_keys" << EOF
+{{ include (joinPath .chezmoi.sourceDir "private_dot_ssh/id_ed25519_termux-a24.pub") | trim  }}
+{{ include (joinPath .chezmoi.sourceDir "private_dot_ssh/id_ed25519_zbook-debian.pub") | trim  }}
+{{ include (joinPath .chezmoi.sourceDir "private_dot_ssh/id_ed25519_zbook-windows.pub") | trim  }}
+EOF
+chmod 600 "$SSH_DIR/authorized_keys"
+
+# 7. Android/Termux Specific Tasks
+{{- if eq .chezmoi.os "android" }}
+if [ ! -d "$HOME_DIR/storage" ]; then
+  termux-setup-storage
+fi
+
+# Link external storage if directory exists
+if [ -d "/storage/1234-5678" ] && [ ! -L "$HOME_DIR/external" ]; then
+    ln -s "/storage/1234-5678" "$HOME_DIR/external"
+fi
+
+# Backup motd safely
+MOTD_PATH="$HOME_DIR/../usr/etc/motd"
+if [ -f "$MOTD_PATH" ]; then
+  mv "$MOTD_PATH" "${MOTD_PATH}~"
+fi
+
+# Set Zsh shell
+if [ "${SHELL:-}" != "$(which zsh)" ]; then
+  chsh -s zsh "{{ .chezmoi.username }}"
+fi
+
+# Setup Font
+FONT_SRC="$HOME_DIR/.termux/fonts/Hack/HackNerdFontMono-Bold.ttf"
+if [ -f "$FONT_SRC" ]; then
+  mkdir -p "$HOME_DIR/.termux"
+  cp "$FONT_SRC" "$HOME_DIR/.termux/font.ttf"
+  termux-reload-settings
+fi
+
+# Downloads Symlink
+if [ ! -e "$HOME_DIR/Downloads"  ] && [ ! -L "$HOME_DIR/Downloads"  ] && [ -d "$HOME_DIR/storage/downloads"  ]; then
+    ln -s "$HOME_DIR/storage/downloads" "$HOME_DIR/Downloads"
+fi
+{{- end }}
+
+echo "$(basename "$0") finished executing all commands"
+{{- end }}
