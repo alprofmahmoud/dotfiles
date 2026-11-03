@@ -1,0 +1,5 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+# font version: {{ .nerdFontsVersion }}
+fc-cache -f
+{{- end }}

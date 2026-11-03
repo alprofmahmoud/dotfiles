@@ -1,0 +1,16 @@
+{{- if eq .chezmoi.os "windows" -}}
+# font version: {{ .nerdFontsVersion }}
+$ErrorActionPreference = 'Stop'
+
+$fontDir = Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\Fonts\Hack'
+$reg = 'HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts'
+
+Get-ChildItem -Path $fontDir -Recurse -File |
+    Where-Object { $_.Extension -in '.ttf', '.otf' } |
+    ForEach-Object {
+        # Registry suffix must match the font format
+        $type = if ($_.Extension -eq '.otf') { 'OpenType' } else { 'TrueType' }
+        New-ItemProperty -Path $reg -Name "$($_.BaseName) ($type)" `
+            -Value $_.FullName -PropertyType String -Force | Out-Null
+    }
+{{- end }}
