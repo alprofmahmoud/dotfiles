@@ -88,6 +88,12 @@ prepend_path XDG_DATA_DIRS "$HOME/.local/share/flatpak/exports/share"
 # Deno (adds ~/.deno/bin to PATH)
 [ -f "$HOME/.deno/env" ] && . "$HOME/.deno/env"
 
+# --- Android ---
+{{ if eq .chezmoi.os "android" -}}
+# Load Termux-specific settings
+source "$HOME/.config/zsh/termux.zsh"
+{{ end -}}
+
 # ============================================
 # 2. Oh My Zsh (settings must come BEFORE the source line)
 # ============================================
