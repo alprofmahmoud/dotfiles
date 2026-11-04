@@ -1,17 +1,38 @@
+{{- /* ================= Neovim paths ================= */ -}}
+{{- /* Default (Linux / Termux): config lives in ~/.config/nvim */}}
 {{- $nvimdir := printf "%s/.config/nvim" .chezmoi.homeDir }}
-
 {{- $pluginsdir := printf "%s/plugins-config" $nvimdir }}
+{{- /* Windows: override with the AppData location */}}
 {{- if eq .chezmoi.os "windows" }}
 {{-   $nvimdir = printf "%s/AppData/Local/nvim" .chezmoi.homeDir }}
 {{-   $pluginsdir = printf "%s\\plugins-config" $nvimdir }}
 {{- end }}
+
+{{- /* ========== Windows only: environment for scripts ========== */}}
+{{- /* Point TMP/TEMP to the user's Temp dir (backslashes for Windows) */}}
 {{- if eq .chezmoi.os "windows" }}
 [scriptEnv]
     TMP  = {{ printf "%s/AppData/Local/Temp" .chezmoi.homeDir | replace "/" "\\" | quote }}
     TEMP = {{ printf "%s/AppData/Local/Temp" .chezmoi.homeDir | replace "/" "\\" | quote }}
 {{- end }}
-[data]
+
+{{- /* ================= Device name ================= */}}
+{{- /* Termux: "termux-" + device codename from getprop. */}}
+{{- /* Other systems: lowercase hostname (set it to e.g. zbook-debian). */}}
+{{- /* Do NOT use "-}}" here: it would glue [data] to the previous line. */}}
+{{- $device := "" }}
 {{- if eq .chezmoi.os "android" }}
+{{-   $device = printf "termux-%s" (output "getprop" "ro.product.device" | trim) }}
+{{- else }}
+{{-   $device = .chezmoi.hostname | lower }}
+{{- end -}}
+
+[data]
+  device = {{ $device | quote }}
+
+{{- /* Environment / distro name used by other templates */}}
+{{- if eq .chezmoi.os "android" }}
+  {{- /* Termux has no osRelease, so use a fixed name */}}
   {{- if not .chezmoi.osRelease }}
   environment = "termux"
   distro      = "termux"
@@ -21,6 +42,7 @@
   {{- end }}
 
 {{- else if eq .chezmoi.os "linux" }}
+  {{- /* Debian, Void, etc. (from /etc/os-release) */}}
   environment = {{ .chezmoi.osRelease.id | quote }}
   distro      = {{ .chezmoi.osRelease.id | quote }}
 
@@ -28,24 +50,28 @@
     environment = "windows"
     distro      = "windows"
 {{- else }}
+  {{- /* Fallback for any other OS (e.g. darwin) */}}
   environment = {{ .chezmoi.os | quote }}
   distro      = {{ .chezmoi.os | quote }}
 {{- end }}
 
+  {{- /* Neovim paths computed at the top of this file */}}
   nvimdir    = {{ $nvimdir | quote }}
   pluginsdir = {{ $pluginsdir | quote }}
 
+{{- /* Windows only: PowerShell profile directory */}}
 {{- if eq .chezmoi.os "windows" }}
   windir_profile = {{ printf "%s\\Documents\\PowerShell" .chezmoi.homeDir | quote }}
 {{- end }}
 
+{{- /* ============ Interpreters / "chezmoi cd" shell ============ */}}
 {{- if eq .chezmoi.os "windows" }}
 # Run .ps1 scripts with pwsh (must be installed before first apply)
 [interpreters.ps1]
     command = "pwsh"
     args = ["-NoLogo", "-NoProfile"]
 {{- else }}
+# "chezmoi cd" opens the user's shell (falls back to sh if SHELL is unset)
 [cd]
-  command = {{ env "SHELL" | quote  }}
+  command = {{ env "SHELL" | default "/bin/sh" | quote }}
 {{- end }}
-

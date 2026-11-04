@@ -7,9 +7,10 @@
 
 # --- Host id (used by the autosuggest strategy and the widgets) ---
 {{- if eq .chezmoi.os "android" }}
-export ATUIN_HOST_NAME="termux"
-export ATUIN_HOST_USER="tmx-a24"
-_ATUIN_HOST_ID="termux:tmx-a24"
+export ATUIN_HOST_NAME={{ .device | quote  }}
+export ATUIN_HOST_USER="tmx"
+#Build the id from the two variables above so they never drift apart
+_ATUIN_HOST_ID="${ATUIN_HOST_NAME}:${ATUIN_HOST_USER}"
 {{- else }}
 _ATUIN_HOST_ID="$(hostname):$(id -un)"
 {{- end }}
