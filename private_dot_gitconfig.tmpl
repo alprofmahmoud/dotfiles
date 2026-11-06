@@ -1,5 +1,8 @@
 [core]
 	editor = nvim
+  {{- if eq .chezmoi.os "windows" }}
+	sshCommand = C:/Windows/System32/OpenSSH/ssh.exe
+  {{- end }}
 [alias]
 	st = status
 	cm = commit -m
@@ -20,3 +23,6 @@
 	gpgsign = true
 [gpg "ssh"]
 	allowedSignersFile = {{ .chezmoi.homeDir }}/.ssh/allowed_signers
+  {{- if eq .chezmoi.os "windows" }}
+	program = C:/Windows/System32/OpenSSH/ssh-keygen.exe
+  {{- end }}

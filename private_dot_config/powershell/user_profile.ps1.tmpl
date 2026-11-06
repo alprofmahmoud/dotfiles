@@ -37,3 +37,16 @@ function which ($command) {
 	  Get-Command -Name $command -ErrorAction SilentlyContinue |
 	  	Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue
 	}
+
+# zoxide
+if (Get-Command zoxide -ErrorAction SilentlyContinue) { Invoke-Expression (& { (zoxide init powershell | Out-String) }) }
+
+# atuin PATH
+$atuinBin = "$env:USERPROFILE\.atuin\bin"
+if ((Test-Path $atuinBin) -and ($env:Path -notlike "*$atuinBin*")) {
+    $env:Path = "$atuinBin;$env:Path"
+}
+
+# atuin
+if (Get-Command atuin -ErrorAction SilentlyContinue) { atuin init powershell | Out-String | Invoke-Expression }
+

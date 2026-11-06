@@ -25,7 +25,7 @@
 {{-   $device = printf "termux-%s" (output "getprop" "ro.product.device" | trim) }}
 {{- else }}
 {{-   $device = .chezmoi.hostname | lower }}
-{{- end -}}
+{{- end }}
 
 [data]
   device = {{ $device | quote }}
