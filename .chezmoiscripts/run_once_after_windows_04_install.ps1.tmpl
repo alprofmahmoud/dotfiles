@@ -1,0 +1,47 @@
+{{- if eq .chezmoi.os "windows" -}}
+# Purpose: install vim-plug, oh-my-posh, fzf and the PowerShell modules.
+
+# Stop on the first error so a failure is never reported as success
+$ErrorActionPreference = 'Stop'
+
+# --- vim-plug ---
+$autoload = Join-Path $env:LOCALAPPDATA 'nvim-data\site\autoload'
+
+# Create the folder first (-Force: no error if it already exists)
+New-Item -ItemType Directory -Force -Path $autoload | Out-Null
+
+Invoke-WebRequest -UseBasicParsing `
+    -Uri 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim' `
+    -OutFile (Join-Path $autoload 'plug.vim')
+
+# --- winget packages ---
+# Id  = winget package id
+# Cmd = command used to check if it is already installed
+$wingetPackages = @(
+    @{ Id = 'JanDeDobbeleer.OhMyPosh'; Cmd = 'oh-my-posh' }
+    @{ Id = 'junegunn.fzf';            Cmd = 'fzf' }
+    @{ Id = 'ajeetdsouza.zoxide';      Cmd = 'zoxide' }
+    @{ Id = 'Atuinsh.Atuin';           Cmd = 'atuin' }
+)
+
+foreach ($pkg in $wingetPackages) {
+    # Already installed: skip
+    if (Get-Command $pkg.Cmd -ErrorAction SilentlyContinue) { continue }
+
+    # -e = exact id match, -s winget = skip the msstore source
+    winget install --id $pkg.Id -e -s winget --silent `
+        --accept-source-agreements --accept-package-agreements
+    if ($LASTEXITCODE -ne 0) { throw "winget failed for $($pkg.Id) (exit $LASTEXITCODE)" }
+}
+
+# --- PowerShell modules ---
+$modules = 'Terminal-Icons', 'PSFzf'
+
+foreach ($name in $modules) {
+    # Already installed: skip
+    if (Get-Module -ListAvailable -Name $name) { continue }
+
+    # CurrentUser: no Administrator needed
+    Install-Module -Name $name -Repository PSGallery -Scope CurrentUser -Force
+}
+{{- end }}
