@@ -1,0 +1,40 @@
+{{- if eq .chezmoi.os "windows" -}}
+# Purpose: install administrators_authorized_keys for OpenSSH Server.
+# Windows OpenSSH reads this file (not ~/.ssh/authorized_keys)
+# for users who are members of the Administrators group.
+# run_onchange_: re-runs automatically whenever the keys below change.
+
+# Stop on the first error so a failure is never reported as success
+$ErrorActionPreference = 'Stop'
+
+# Writing to C:\ProgramData\ssh requires an elevated shell.
+# Fail early with a clear message instead of a confusing access error.
+$principal = [Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()
+if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    throw "Run 'chezmoi apply' from an elevated shell"
+}
+
+# Public keys, read as plain files from the source dir.
+# 'trim' removes the trailing newline of each key.
+# Single-quoted here-string: no escaping problems with special characters.
+$keys = @'
+{{ include "private_dot_ssh/id_ed25519_zbook-debian.pub" | trim }}
+{{ include "private_dot_ssh/id_ed25519_termux-a24.pub" | trim }}
+'@
+
+$dir = Join-Path $env:ProgramData 'ssh'
+$adminKeys = Join-Path $dir 'administrators_authorized_keys'
+
+# -Force: no error if the folder already exists
+New-Item -ItemType Directory -Force -Path $dir | Out-Null
+
+# ASCII encoding: OpenSSH can choke on a UTF-8 BOM
+Set-Content -Path $adminKeys -Value $keys -Encoding ascii
+
+# OpenSSH requires exactly SYSTEM and Administrators on this file.
+# *S-1-5-18 = SYSTEM, *S-1-5-32-544 = Administrators (language independent).
+icacls $adminKeys /inheritance:r /grant '*S-1-5-18:F' /grant '*S-1-5-32-544:F' | Out-Null
+if ($LASTEXITCODE -ne 0) { throw "icacls failed on $adminKeys (exit $LASTEXITCODE)" }
+
+Write-Host 'Admin authorized_keys installed!' -ForegroundColor Green
+{{- end }}

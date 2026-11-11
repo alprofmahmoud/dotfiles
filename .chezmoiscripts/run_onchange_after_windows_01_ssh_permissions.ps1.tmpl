@@ -1,0 +1,53 @@
+{{- if eq .chezmoi.os "windows" -}}
+# Purpose: write ~/.ssh/authorized_keys and restrict ~/.ssh permissions
+# so OpenSSH accepts the keys. Works for Standard users too.
+# run_onchange_: re-runs automatically whenever the keys below change.
+
+# Stop on the first error so a failure is never reported as success
+$ErrorActionPreference = 'Stop'
+
+$sshDir = Join-Path $env:USERPROFILE '.ssh'
+
+# Current user SID (prefixed with * for icacls).
+# SIDs work on any Windows language, unlike account names.
+$me = '*' + [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+
+# Helper: remove inherited permissions, grant only what we pass in,
+# and fail loudly if icacls returns a non-zero exit code.
+function Set-SshAcl {
+    param([string]$Path, [string]$Grant)
+    icacls $Path /inheritance:r /grant:r $Grant | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw "icacls failed on $Path (exit $LASTEXITCODE)" }
+}
+
+# 1) Write the user's authorized_keys (read by sshd for Standard users).
+# Public keys are plain files in the source dir (no decryption needed).
+# 'trim' removes the trailing newline of each key.
+$keys = @'
+{{ include "private_dot_ssh/id_ed25519_zbook-debian.pub" | trim }}
+{{ include "private_dot_ssh/id_ed25519_termux-a24.pub" | trim }}
+'@
+
+# -Force: no error if the folder already exists
+New-Item -ItemType Directory -Force -Path $sshDir | Out-Null
+
+# ASCII encoding: OpenSSH can choke on a UTF-8 BOM
+Set-Content -Path (Join-Path $sshDir 'authorized_keys') -Value $keys -Encoding ascii
+
+# 2) The .ssh folder itself.
+# (OI)(CI) = new files and subfolders inherit this permission, F = full control.
+# ${me} needs braces, otherwise "$me:" is parsed as a variable scope.
+Set-SshAcl $sshDir "${me}:(OI)(CI)F"
+
+# 3) Private keys (id_*, but not *.pub), config, and authorized_keys.
+# sshd (StrictModes) rejects authorized_keys if other users can write to it.
+# Public keys are not secret, so they are left alone.
+Get-ChildItem $sshDir -File |
+    Where-Object {
+        ($_.Name -like 'id_*' -and $_.Extension -ne '.pub') -or
+        $_.Name -in 'config', 'authorized_keys'
+    } |
+    ForEach-Object { Set-SshAcl $_.FullName "${me}:F" }
+
+Write-Host 'SSH keys and permissions fixed!' -ForegroundColor Green
+{{- end }}
