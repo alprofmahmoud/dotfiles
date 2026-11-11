@@ -156,8 +156,8 @@ alias src="source ~/.zshrc"
 # 8. Welcome Message
 # ============================================
 if [[ -z "$WELCOME_DONE" ]]; then
-  if command -v figlet &>/dev/null && [[ -f "$HOME/.config/big.flf" ]]; then
-    figlet -f "$HOME/.config/big.flf" Prof | head -n -1
+  if command -v figlet &>/dev/null && [[ -f "$HOME/.local/share/figlet/big.flf" ]]; then
+    figlet -f "$HOME/.local/share/figlet/big.flf" Prof | head -n -1
   fi
   print -P "Hello Pro"
   print -P "The time is %F{yellow}$(date +%T)%f and this machine is called %F{green}${_ATUIN_HOST_ID}%f"
