@@ -1,0 +1,35 @@
+{{- if eq .chezmoi.os "windows" -}}
+# Purpose: make %LOCALAPPDATA%\nvim point to ~/.config/nvim,
+# so Neovim on Windows reads the same config as on Linux.
+
+# Stop on the first error so a failure is never reported as success
+$ErrorActionPreference = 'Stop'
+
+# $link   = the path Neovim reads on Windows (becomes a junction)
+# $target = the real folder that holds the config
+$link   = Join-Path $env:LOCALAPPDATA 'nvim'
+$target = Join-Path $env:USERPROFILE '.config\nvim'
+
+# A junction needs an existing target folder
+New-Item -ItemType Directory -Force -Path $target | Out-Null
+
+# -ErrorAction SilentlyContinue: returns $null if the path does not exist
+$item = Get-Item -Path $link -Force -ErrorAction SilentlyContinue
+
+# Already a link (junction or symlink): nothing to do
+if ($item -and $item.LinkType) {
+    Write-Host 'nvim link already exists, skipping'
+    return
+}
+
+# Real folder: keep it as a backup instead of deleting it.
+# Rename-Item fails if nvim.bak already exists (a backup is never overwritten).
+if ($item) {
+    Rename-Item -Path $link -NewName 'nvim.bak'
+    Write-Host 'Existing nvim folder renamed to nvim.bak'
+}
+
+# Junction: no Administrator or Developer Mode needed (unlike SymbolicLink)
+New-Item -ItemType Junction -Path $link -Target $target | Out-Null
+Write-Host 'nvim junction created' -ForegroundColor Green
+{{- end }}
