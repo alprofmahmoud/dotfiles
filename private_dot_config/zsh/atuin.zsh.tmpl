@@ -82,7 +82,7 @@ atuin-fzf-widget() {
 zle -N atuin-fzf-widget
 bindkey '^R' atuin-fzf-widget
 
-# --- Up/Down arrow: newest first; same host > rest. Reads atuin DB directly ---
+# --- Up/Down arrow: newest first; same host+dir > same host > rest. Reads atuin DB directly ---
 typeset -ga _ATUIN_UP_LIST
 typeset -gi _ATUIN_UP_IDX=0
 typeset -g  _ATUIN_UP_ORIG=""
@@ -92,6 +92,7 @@ _atuin_up_local() {
     emulate -L zsh
     # Rebuild the list on the first press of a sequence
     if [[ $LASTWIDGET != _atuin_up_local && $LASTWIDGET != _atuin_down_local ]]; then
+        local d=${PWD//\'/\'\'}
         _ATUIN_UP_ORIG=$BUFFER
         _ATUIN_UP_LIST=("${(@f)$(sqlite3 -readonly "$_ATUIN_DB" "
             SELECT command FROM history
@@ -100,7 +101,8 @@ _atuin_up_local() {
               AND command NOT LIKE '%' || char(10) || '%'
               AND exit != 127
             GROUP BY command
-            ORDER BY MAX(hostname = '$_ATUIN_HOST_ID') DESC,
+            ORDER BY MAX(hostname = '$_ATUIN_HOST_ID' AND cwd = '$d') DESC,
+                     MAX(hostname = '$_ATUIN_HOST_ID') DESC,
                      MAX(timestamp) DESC
             LIMIT 200;" 2>/dev/null)}")
         _ATUIN_UP_IDX=0
