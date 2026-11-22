@@ -1,5 +1,5 @@
 {{- if eq .chezmoi.os "android" -}}
-#!/bin/bash
+#!{{ lookPath "zsh"  }}
 # font version: {{ .nerdFontsVersion }}
 cp ~/.termux/fonts/Hack/HackNerdFont-Bold.ttf ~/.termux/font.ttf
 command -v termux-reload-settings >/dev/null && termux-reload-settings
